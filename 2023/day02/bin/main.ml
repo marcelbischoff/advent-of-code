@@ -2,7 +2,7 @@ let read_file file = In_channel.with_open_text file In_channel.input_all
 let split_str sep = Str.(split (regexp sep))
 let sum = List.fold_left ( + ) 0
 
-let _check_color color =
+let check_color color =
   let splits = split_str " " color in
   let color = List.nth splits 1 in
   let count = List.nth splits 0 |> int_of_string in
@@ -14,7 +14,7 @@ let _check_color color =
 
 let parse_rgb s =
   let colors = split_str ", " s in
-  colors |> List.for_all _check_color
+  colors |> List.for_all check_color
 
 let parse_rgbs s =
   let items = split_str "; " s in
