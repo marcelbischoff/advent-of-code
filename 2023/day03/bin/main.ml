@@ -48,13 +48,6 @@ let solve file =
   let h = List.length lines in
   let mat = lines |> List.map (split_str "") in
   let w = List.nth mat 0 |> List.length in
-  (*
-  let () = "h = " ^ string_of_int h |> print_endline in
-  let () = "w = " ^ string_of_int w |> print_endline in
-  let () =
-    mat |> List.map (String.concat " ") |> String.concat "\n" |> print_endline
-  in
-  *)
   scan mat h w
 
 (* -- part 2 -- *)
@@ -110,12 +103,6 @@ let scan2 mat h w =
   in
   let part_numbers = aux 0 0 [] "" [] in
   let _stars = part_numbers |> List.map (fun a -> fst a) |> unique in
-  let () =
-    _stars
-    |> List.map (fun a ->
-           "star: " ^ string_of_int (fst a) ^ " " ^ string_of_int (snd a))
-    |> String.concat "\n" |> print_endline
-  in
   let star_value star =
     let part_numbers_filtered =
       List.filter (fun a -> fst a = star) part_numbers
@@ -131,21 +118,11 @@ let solve2 file =
   let h = List.length lines in
   let mat = lines |> List.map (split_str "") in
   let w = List.nth mat 0 |> List.length in
-  let () = "h = " ^ string_of_int h |> print_endline in
-  let () = "w = " ^ string_of_int w |> print_endline in
-  let () =
-    mat |> List.map (String.concat " ") |> String.concat "\n" |> print_endline
-  in
   scan2 mat h w
 ;;
 
-let () = print_endline "===" in
-let () = solve2 "input.txt" |> string_of_int |> print_endline in
-let () = print_endline "===" in
-print_endline "--"
-;;
-
-let () = assert (solve2 "sample.txt" = 467835) in
 let () = assert (solve "sample.txt" = 4361) in
+let () = assert (solve2 "sample.txt" = 467835) in
 let () = solve "input.txt" |> string_of_int |> print_endline in
+let () = solve2 "input.txt" |> string_of_int |> print_endline in
 print_endline ""
