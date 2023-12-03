@@ -61,11 +61,11 @@ let solve file =
 
 let scan2 mat h w =
   let comp a b =
-      if a = b then 0 
-      else if fst a > fst b then 1
-      else if fst b > fst a then -1 
-      else if snd a > snd b then 1
-      else -1
+    if a = b then 0
+    else if fst a > fst b then 1
+    else if fst b > fst a then -1
+    else if snd a > snd b then 1
+    else -1
   in
   let unique = List.sort_uniq comp in
   let char_of_string s = String.get s 0 in
@@ -80,22 +80,22 @@ let scan2 mat h w =
     else match get i j |> char_of_string with '*' -> Some (i, j) | _ -> None
   in
   let get_stars i j =
-      [
-        get_star (i - 1) (j - 1);
-        get_star (i - 1) j;
-        get_star (i - 1) (j + 1);
-        get_star (i + 1) (j - 1);
-        get_star (i + 1) j;
-        get_star (i + 1) (j + 1);
-        get_star i (j - 1);
-        get_star i (j + 1);
-      ] |> List.to_seq |> Seq.filter_map Fun.id |> List.of_seq
+    [
+      get_star (i - 1) (j - 1);
+      get_star (i - 1) j;
+      get_star (i - 1) (j + 1);
+      get_star (i + 1) (j - 1);
+      get_star (i + 1) j;
+      get_star (i + 1) (j + 1);
+      get_star i (j - 1);
+      get_star i (j + 1);
+    ]
+    |> List.to_seq |> Seq.filter_map Fun.id |> List.of_seq
   in
   let rec aux i j stars part_number acc =
     let new_acc =
-        let inner acc' a =
-            (a, int_of_string part_number) :: acc' in
-        unique stars |> List.fold_left inner acc
+      let inner acc' a = (a, int_of_string part_number) :: acc' in
+      unique stars |> List.fold_left inner acc
     in
     if i >= h then acc
     else if j >= w then aux (i + 1) 0 [] "" new_acc
@@ -103,19 +103,26 @@ let scan2 mat h w =
       let item = get i j in
       match char_of_string item with
       | '0' .. '9' ->
-              aux i (j + 1) (List.concat [stars; get_stars i j]) (part_number ^ item) acc
+          aux i (j + 1)
+            (List.concat [ stars; get_stars i j ])
+            (part_number ^ item) acc
       | _ -> aux i (j + 1) [] "" new_acc
   in
   let part_numbers = aux 0 0 [] "" [] in
   let _stars = part_numbers |> List.map (fun a -> fst a) |> unique in
-  let () = _stars |> List.map (fun a -> "star: " ^ (string_of_int (fst a)) ^ " " ^ (string_of_int (snd a))) 
-      |> String.concat "\n" |> print_endline  in
-  let star_value star = 
-      let part_numbers_filtered = List.filter (fun a -> (fst a = star)) part_numbers in
-      if (List.length part_numbers_filtered) = 2 then
-        part_numbers_filtered |> (List.map (fun a -> snd a)) |> _prod
-      else
-      0
+  let () =
+    _stars
+    |> List.map (fun a ->
+           "star: " ^ string_of_int (fst a) ^ " " ^ string_of_int (snd a))
+    |> String.concat "\n" |> print_endline
+  in
+  let star_value star =
+    let part_numbers_filtered =
+      List.filter (fun a -> fst a = star) part_numbers
+    in
+    if List.length part_numbers_filtered = 2 then
+      part_numbers_filtered |> List.map (fun a -> snd a) |> _prod
+    else 0
   in
   _stars |> List.map star_value |> _sum
 
@@ -135,7 +142,9 @@ let solve2 file =
 let () = print_endline "===" in
 let () = solve2 "input.txt" |> string_of_int |> print_endline in
 let () = print_endline "===" in
-print_endline "--";;
+print_endline "--"
+;;
+
 let () = assert (solve2 "sample.txt" = 467835) in
 let () = assert (solve "sample.txt" = 4361) in
 let () = solve "input.txt" |> string_of_int |> print_endline in
