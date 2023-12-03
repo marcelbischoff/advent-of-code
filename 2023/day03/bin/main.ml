@@ -3,11 +3,10 @@ let split_str sep = Str.(split (regexp sep))
 let sum = List.fold_left ( + ) 0
 let prod = List.fold_left ( * ) 1
 let string_of_char = String.make 1
-(*let (let* ) = Option.bind *)
+let ( let* ) = Option.bind
 
 let get_from_mat arr h w i j =
-  if (j >= 0 && j < w && i >= 0 && i < h) then
-    Some (String.get arr (j + (i * w)))
+  if j >= 0 && j < w && i >= 0 && i < h then Some (String.get arr (j + (i * w)))
   else None
 
 let scan arr h w =
@@ -16,9 +15,7 @@ let scan arr h w =
   let is_marker i j =
     if i < 0 || i >= h || j < 0 || j >= w then false
     else
-      match get i j |> Option.get with
-      | '0' .. '9' | '.' -> false
-      | _ -> true
+      match get i j |> Option.get with '0' .. '9' | '.' -> false | _ -> true
   in
   let check i j =
     is_marker (i - 1) (j - 1)
@@ -40,7 +37,10 @@ let scan arr h w =
       let item = get i j |> Option.get in
       match item with
       | '0' .. '9' ->
-          aux i (j + 1) (is_part_number || check i j) (part_number ^ (string_of_char item)) acc
+          aux i (j + 1)
+            (is_part_number || check i j)
+            (part_number ^ string_of_char item)
+            acc
       | _ -> aux i (j + 1) false "" new_acc
   in
   aux 0 0 false "" 0
@@ -63,12 +63,12 @@ let scan2 arr h w =
     else -1
   in
   let unique = List.sort_uniq comp in
-  let get= get_from_mat arr h w in
+  let get = get_from_mat arr h w in
   let get_star i j =
-    if i < 0 || i >= h || j < 0 || j >= w then None
-    else match get i j |> Option.get with '*' -> Some (i, j) | _ -> None
+    let* item = get i j in
+    match item with '*' -> Some (i, j) | _ -> None
   in
-  let getstars i j =
+  let get_stars i j =
     [
       get_star (i - 1) (j - 1);
       get_star (i - 1) j;
@@ -79,7 +79,7 @@ let scan2 arr h w =
       get_star i (j - 1);
       get_star i (j + 1);
     ]
-    |> List.to_seq |> Seq.filter_map Fun.id |> List.of_seq
+    |> List.filter_map Fun.id
   in
   let rec aux i j stars part_number acc =
     let new_acc =
@@ -93,8 +93,9 @@ let scan2 arr h w =
       match item with
       | '0' .. '9' ->
           aux i (j + 1)
-            (List.concat [ stars; getstars i j ])
-            (part_number ^ (string_of_char item)) acc
+            (List.concat [ stars; get_stars i j ])
+            (part_number ^ string_of_char item)
+            acc
       | _ -> aux i (j + 1) [] "" new_acc
   in
   let part_numbers = aux 0 0 [] "" [] in
