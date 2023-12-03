@@ -1,15 +1,17 @@
 let read_file file = In_channel.with_open_text file In_channel.input_all
 let split_str sep = Str.(split (regexp sep))
-let _sum = List.fold_left ( + ) 0
-let _prod = List.fold_left ( * ) 1
+let sum = List.fold_left ( + ) 0
+let prod = List.fold_left ( * ) 1
+let string_of_char = String.make 1  
+
+let get_from_mat mat h w i j =
+  let () = assert (j >= 0 && j < w) in
+  let () = assert (i >= 0 && i < h) in
+  String.get mat (j + i*w) |> string_of_char
 
 let scan mat h w =
   let char_of_string s = String.get s 0 in
-  let get i j =
-    let () = assert (j >= 0 && j < w) in
-    let () = assert (i >= 0 && i < h) in
-    List.nth (List.nth mat i) j
-  in
+  let get = get_from_mat mat h w in
   let _foo = get 9 2 in
   let is_marker i j =
     if i < 0 || i >= h || j < 0 || j >= w then false
@@ -43,12 +45,12 @@ let scan mat h w =
   in
   aux 0 0 false "" 0
 
-let solve file =
+let solve file scan =
   let lines = read_file file |> split_str "\n" in
   let h = List.length lines in
-  let mat = lines |> List.map (split_str "") in
-  let w = List.nth mat 0 |> List.length in
-  scan mat h w
+  let w = List.nth lines 0 |> String.length in
+  let array = lines |> String.concat "" in
+  scan array h w
 
 (* -- part 2 -- *)
 
@@ -62,17 +64,13 @@ let scan2 mat h w =
   in
   let unique = List.sort_uniq comp in
   let char_of_string s = String.get s 0 in
-  let get i j =
-    let () = assert (j >= 0 && j < w) in
-    let () = assert (i >= 0 && i < h) in
-    List.nth (List.nth mat i) j
-  in
+  let get = get_from_mat mat h w in
   let _foo = get 9 2 in
   let get_star i j =
     if i < 0 || i >= h || j < 0 || j >= w then None
     else match get i j |> char_of_string with '*' -> Some (i, j) | _ -> None
   in
-  let get_stars i j =
+  let getstars i j =
     [
       get_star (i - 1) (j - 1);
       get_star (i - 1) j;
@@ -97,32 +95,25 @@ let scan2 mat h w =
       match char_of_string item with
       | '0' .. '9' ->
           aux i (j + 1)
-            (List.concat [ stars; get_stars i j ])
+            (List.concat [ stars; getstars i j ])
             (part_number ^ item) acc
       | _ -> aux i (j + 1) [] "" new_acc
   in
   let part_numbers = aux 0 0 [] "" [] in
-  let _stars = part_numbers |> List.map (fun a -> fst a) |> unique in
+  let stars = part_numbers |> List.map fst |> unique in
   let star_value star =
     let part_numbers_filtered =
       List.filter (fun a -> fst a = star) part_numbers
     in
     if List.length part_numbers_filtered = 2 then
-      part_numbers_filtered |> List.map (fun a -> snd a) |> _prod
+      part_numbers_filtered |> List.map snd |> prod
     else 0
   in
-  _stars |> List.map star_value |> _sum
-
-let solve2 file =
-  let lines = read_file file |> split_str "\n" in
-  let h = List.length lines in
-  let mat = lines |> List.map (split_str "") in
-  let w = List.nth mat 0 |> List.length in
-  scan2 mat h w
+  stars |> List.map star_value |> sum
 ;;
 
-let () = assert (solve "sample.txt" = 4361) in
-let () = assert (solve2 "sample.txt" = 467835) in
-let () = solve "input.txt" |> string_of_int |> print_endline in
-let () = solve2 "input.txt" |> string_of_int |> print_endline in
+let () = assert (solve "sample.txt" scan = 4361) in
+let () = assert (solve "sample.txt" scan2 = 467835) in
+let () = solve "input.txt" scan |> string_of_int |> print_endline in
+let () = solve "input.txt" scan2 |> string_of_int |> print_endline in
 print_endline ""
