@@ -3,23 +3,32 @@ from math import prod
 from typing import Callable, Dict, Iterable, Tuple
 
 
-def consume(it: Iterable[Tuple[int, str]]) -> int:
-    st = defaultdict(int)
-    for v, k in it: st[k] = max(st[k], v)
-    return st
+def find_max_by_color(it: Iterable[Tuple[int, str]]) -> Dict[str, int]:
+    state: Dict[str, int] = defaultdict(int)
+    for v, k in it:
+        state[k] = max(state[k], v)
+    return state
 
 
-def solve(file: str, fn: Callable[[Dict[str, int]], int]) -> int:
+def solve(file: str, fn: Callable[[Dict[str, int], int], int]) -> int:
     with open(file) as f:
-        lines = f.readlines()
-    return sum(fn(consume(
-            (int((s := y.split(" "))[0]), s[1])
-            for x in line.rstrip().split(": ")[1].split("; ")
-            for y in x.split(", ")
-        ), idx)
-        for idx, line in enumerate(lines))
+        return sum(
+            fn(
+                find_max_by_color(
+                    (int((s := y.split(" "))[0]), s[1])
+                    for x in line.rstrip().split(": ")[1].split("; ")
+                    for y in x.split(", ")
+                ),
+                idx,
+            )
+            for idx, line in enumerate(f.readlines())
+        )
 
 
-print(solve("input.txt", lambda x, i: (i + 1)
-        * (x["red"] <= 12 and x["green"] <= 13 and x["blue"] <= 14)))
+print(
+    solve(
+        "input.txt",
+        lambda x, i: (i + 1) * (x["red"] < 13 and x["green"] < 14 and x["blue"] < 15),
+    )
+)
 print(solve("input.txt", lambda x, _: prod(x.values())))
