@@ -5,17 +5,14 @@ let prod = List.fold_left ( * ) 1
 let string_of_char = String.make 1
 let ( let* ) = Option.bind
 
-let get_from_mat arr h w i j =
+let get_from_array arr h w i j =
   if j >= 0 && j < w && i >= 0 && i < h then Some (String.get arr (j + (i * w)))
   else None
 
 let scan arr h w =
-  let get = get_from_mat arr h w in
-  let _foo = get 9 2 in
+  let get = get_from_array arr h w in
   let is_marker i j =
-    if i < 0 || i >= h || j < 0 || j >= w then false
-    else
-      match get i j |> Option.get with '0' .. '9' | '.' -> false | _ -> true
+    match get i j with Some ('0' .. '9' | '.') | None -> false | _ -> true
   in
   let check i j =
     is_marker (i - 1) (j - 1)
@@ -63,7 +60,7 @@ let scan2 arr h w =
     else -1
   in
   let unique = List.sort_uniq comp in
-  let get = get_from_mat arr h w in
+  let get = get_from_array arr h w in
   let get_star i j =
     let* item = get i j in
     match item with '*' -> Some (i, j) | _ -> None
@@ -82,12 +79,12 @@ let scan2 arr h w =
     |> List.filter_map Fun.id
   in
   let rec aux i j stars part_number acc =
-    let new_acc =
+    let update_acc acc =
       let inner acc' a = (a, int_of_string part_number) :: acc' in
       unique stars |> List.fold_left inner acc
     in
     if i >= h then acc
-    else if j >= w then aux (i + 1) 0 [] "" new_acc
+    else if j >= w then aux (i + 1) 0 [] "" (update_acc acc)
     else
       let item = get i j |> Option.get in
       match item with
@@ -96,7 +93,7 @@ let scan2 arr h w =
             (List.concat [ stars; get_stars i j ])
             (part_number ^ string_of_char item)
             acc
-      | _ -> aux i (j + 1) [] "" new_acc
+      | _ -> aux i (j + 1) [] "" (update_acc acc)
   in
   let part_numbers = aux 0 0 [] "" [] in
   let stars = part_numbers |> List.map fst |> unique in
