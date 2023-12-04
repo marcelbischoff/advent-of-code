@@ -53,11 +53,8 @@ let solve file scan =
 
 let scan2 arr h w =
   let comp a b =
-    if a = b then 0
-    else if fst a > fst b then 1
-    else if fst b > fst a then -1
-    else if snd a > snd b then 1
-    else -1
+    let tie = compare (fst a) (fst b) in
+    if tie = 0 then compare (snd a) (snd b) else tie
   in
   let unique = List.sort_uniq comp in
   let get = get_from_array arr h w in
