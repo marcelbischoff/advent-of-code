@@ -1,0 +1,16 @@
+(lang dune 3.10)
+
+(name aoc)
+
+(generate_opam_files true)
+
+(source
+ (github marcelbischoff/advent-of-code))
+
+(authors "Marcel Bischoff")
+
+(package
+ (name aoc)
+ (depends ocaml dune))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
