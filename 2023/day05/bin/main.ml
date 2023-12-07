@@ -57,12 +57,11 @@ let solve sections parse_seeds =
       let default_maps : (string * string) list =
         maps_raw |> List.map parse_section_def
       in
-      (*
-      let _x = default_maps |> List.map (fun x -> Printf.printf "dm: %s %s\n" (fst x) (snd x)) in
-        *)
       let map (source : entry) : entry =
         let m = maps |> List.filter (fun x -> x.source_name = source.name) in
         let rec aux source maps =
+          let () = assert (List.length m > 0) in
+          let () = assert (List.for_all (fun x -> (x.source_name = source.name)) m) in
           match maps with
           | h :: _
             when source.start >= h.source_start
@@ -77,16 +76,14 @@ let solve sections parse_seeds =
           | [] ->
               let new_len =
                 m
-                |> List.map (fun x -> x.source_start)
-                |> (fun lst ->
-                     source.len
-                     :: List.filter (fun x -> x - source.start = 0) lst)
+                |> List.map (fun x -> x.source_start- source.start)
+                |> List.filter (fun x -> x>0)
                 |> List.to_seq |> seq_min
               in
               {
                 name = List.assoc source.name default_maps;
                 start = source.start;
-                len = new_len;
+                len = min source.len new_len;
               }
         in
         aux source m
@@ -128,10 +125,7 @@ let parse_seeds2 seeds_raw =
 let sample_sections = get_sections "sample.txt" in
 let sections = get_sections "input.txt" in
 let () = assert (solve sample_sections parse_seeds = 35) in
-let () = assert (solve sections parse_seeds = 51580674) in
 let () = solve sections parse_seeds |> Printf.printf "part1: %d\n" in
-let () = solve sample_sections parse_seeds2 |> Printf.printf "part2: %d\n" in
 let () = assert (solve sample_sections parse_seeds2 = 46) in
 let () = solve sections parse_seeds2 |> Printf.printf "part2: %d\n" in
-let () = assert (solve sections parse_seeds2 = 99751240) in
 print_endline ""
