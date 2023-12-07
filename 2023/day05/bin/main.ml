@@ -14,8 +14,8 @@ type rule = {
   len : int;
 }
 
-let explode_intervals (source_name : string) (target_name : string) (s : string)
-    : rule =
+let parse_rule (source_name : string) (target_name : string) (s : string) : rule
+    =
   let res =
     match s |> split_str " " |> List.map int_of_string with
     | [ target_start; source_start; len ] ->
@@ -27,10 +27,9 @@ let explode_intervals (source_name : string) (target_name : string) (s : string)
 let parse_section (section : string) : rule list =
   match section |> split_str "\n" with
   | [] -> failwith "section wrong"
-  | _maptype :: maps_raw -> (
-      match _maptype |> split_str " map:" |> nth 0 |> split_str "-to-" with
-      | [ source; target ] ->
-          maps_raw |> List.map (explode_intervals source target)
+  | maptype :: maps_raw -> (
+      match maptype |> split_str " map:" |> nth 0 |> split_str "-to-" with
+      | [ source; target ] -> maps_raw |> List.map (parse_rule source target)
       | _ -> failwith "parse error")
 
 let parse_section_def section =
@@ -74,8 +73,8 @@ let solve sections parse_seeds =
           | [] ->
               let new_len =
                 m
-                |> List.map (fun x -> x.source_start- source.start)
-                |> List.filter (fun x -> x>0)
+                |> List.map (fun x -> x.source_start - source.start)
+                |> List.filter (fun x -> x > 0)
                 |> List.to_seq |> seq_min
               in
               {
