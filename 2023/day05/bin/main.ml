@@ -60,8 +60,6 @@ let solve sections parse_seeds =
       let map (source : entry) : entry =
         let m = maps |> List.filter (fun x -> x.source_name = source.name) in
         let rec aux source maps =
-          let () = assert (List.length m > 0) in
-          let () = assert (List.for_all (fun x -> (x.source_name = source.name)) m) in
           match maps with
           | h :: _
             when source.start >= h.source_start
@@ -89,7 +87,6 @@ let solve sections parse_seeds =
         aux source m
       in
       let rec play_ent (source : entry) (curr : entry) : int =
-        let () = assert (source.name = "seed") in
         if curr.name = "location" then
           if curr.len = source.len then curr.start
           else
@@ -103,7 +100,6 @@ let solve sections parse_seeds =
             play_ent new_source new_source |> min curr.start
         else
           let target = map curr in
-          let () = assert (target.len <= source.len) in
           target |> play_ent source
       in
       start |> Seq.map (fun src -> play_ent src src) |> seq_min
