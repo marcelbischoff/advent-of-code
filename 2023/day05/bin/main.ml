@@ -1,7 +1,7 @@
 let read_file file = In_channel.with_open_text file In_channel.input_all
 let split_str sep = Str.(split (regexp sep))
 let nth n lst = List.nth lst n
-let list_min = List.fold_left min Int.max_int
+let seq_min = Seq.fold_left min Int.max_int
 let get_sections filename = read_file filename |> split_str "\n\n"
 
 type entry = { name : string; num : int }
@@ -39,17 +39,13 @@ let parse_section_def section =
 let parse_seeds seeds_raw = 
         seeds_raw |> split_str "seeds: " |> nth 0 |> split_str " "
         |> List.map (fun x -> { name = "seed"; num = int_of_string x })
+        |> List.to_seq
 
 let solve sections parse_seeds =
   match sections with
   | [] -> failwith "section wrong"
   | seeds_raw :: maps_raw ->
-      let start = parse_seeds seeds_raw
-      in
-      let () =
-        start
-        |> List.map (fun x -> x.num |> string_of_int)
-        |> String.concat "," |> print_endline
+      let start = parse_seeds seeds_raw 
       in
       let maps : rule list =
         maps_raw |> List.map parse_section |> List.concat
@@ -74,16 +70,21 @@ let solve sections parse_seeds =
       let rec play_ent source =
         if source.name = "location" then source.num else map source |> play_ent
       in
-      start |> List.map play_ent |> list_min
+      start |> Seq.map play_ent |> seq_min
 
 let parse_seeds2 seeds_raw = 
     let nums = seeds_raw |> split_str "seeds: " |> nth 0 |> split_str " " |> List.map int_of_string in
     let rec aux nums acc = 
-        match aux with 
-        [] -> acc
-        [start; len] :: tail ->
-
-        |> List.map (fun x -> { name = "seed"; num = int_of_string x })
+        match nums with 
+        | start:: len:: tail -> (
+            let new_seeds = Seq.init len (fun x -> x + start) 
+            |> Seq.map (fun x -> { name = "seed"; num =  x }) in 
+            aux tail (Seq.append acc new_seeds)
+        )
+        | [] -> acc
+        | _ -> failwith "dump"
+    in
+    aux nums ([] |> List.to_seq)
 ;;
 
 
@@ -91,11 +92,7 @@ let sample_sections = get_sections "sample.txt" in
 let sections = get_sections "input.txt" in
 let () = assert (solve sample_sections parse_seeds = 35) in
 let () = solve sections parse_seeds |> Printf.printf "\npart1: %d\n" in
-let () = solve sample_sections parse_seeds2 |> Printf.printf "\n\nsample2: %d\n" in
-(*
-let lines = get_lines "input.txt" in
-let () = solve lines |> Printf.printf "part1: %d" in
-let () = solve2 sample_lines |> Printf.printf "sample2: %d" in
-let () = solve2 lines |> Printf.printf "part2: %d" in
-*)
+let () = assert (solve sample_sections parse_seeds2 = 46) in
+let () = print_endline "---" in
+let () = solve sections parse_seeds2 |> Printf.printf "\n\nsample2: %d\n" in
 print_endline ""
