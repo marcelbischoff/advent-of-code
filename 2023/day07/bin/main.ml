@@ -34,18 +34,10 @@ let compare_cards a b =
   else failwith "cards dont coompare"
 
 let get_hand_weight hand =
-  let cards = hand_to_chars hand |> List.sort compare_cards in
-  let rec get_mults cards last_card acc =
-    match cards with
-    | [] -> acc
-    | card :: tail ->
-        if card = last_card then
-          match acc with
-          | h :: acc_tail -> get_mults tail card ((h + 1) :: acc_tail)
-          | _ -> failwith "not possible"
-        else get_mults tail card (1 :: acc)
+  let mults =
+    hand_to_chars hand |> List.sort compare_cards |> List.to_seq
+    |> Seq.group ( = ) |> Seq.map Seq.length |> List.of_seq |> List.sort compare
   in
-  let mults = get_mults cards ' ' [] |> List.sort compare in
   let t =
     match mults with
     | [ 5 ] -> Five
@@ -105,15 +97,18 @@ let compare_cards2 a b =
   else failwith "cards dont coompare"
 
 let rec get_hand_weight2 a =
-  if a = "JJJJJ" then 6 else
-  if String.contains a 'J' then
-    let chars = hand_to_chars a |> List.filter (fun c -> c != 'J') |> List.sort_uniq compare_cards2 in
+  if a = "JJJJJ" then 6
+  else if String.contains a 'J' then
+    let chars =
+      hand_to_chars a
+      |> List.filter (fun c -> c != 'J')
+      |> List.sort_uniq compare_cards2
+    in
     let pos = String.index_from a 0 'J' in
     let r_joker rc = a |> String.mapi (fun i c -> if i = pos then rc else c) in
     let test_hands = chars |> List.map r_joker in
     test_hands |> List.map get_hand_weight2 |> max_lst
-  else
-    get_hand_weight a
+  else get_hand_weight a
 
 let compare_hands2 a b =
   let rec aux ac bc =
