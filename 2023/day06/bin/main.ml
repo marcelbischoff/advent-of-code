@@ -54,7 +54,4 @@ let () = assert (solve sample_lines parse_line = 288) in
 let () = solve lines parse_line |> Printf.printf "part1: %d\n" in
 let () = assert (solve sample_lines parse_line2 = 71503) in
 let () = solve lines parse_line2 |> Printf.printf "part2: %d\n" in
-(*
-let () = solve sections parse_seeds2 |> Printf.printf "part2: %d\n" in
-*)
 print_endline ""
