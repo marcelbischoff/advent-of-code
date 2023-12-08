@@ -1,0 +1,58 @@
+let read_file file = In_channel.with_open_text file In_channel.input_all
+let split_str sep = Str.(split (regexp sep))
+let nth n lst = List.nth lst n
+let get_lines filename = read_file filename |> split_str "\n"
+let prod = List.fold_left ( * ) 1
+
+type entry = { hand : string; value : int }
+type hands = Five | Four | FullHouse | Three | TwoPair | OnePair | HighCard
+
+let _hand_weight = function 
+    | Five -> 6
+    | Four -> 5
+    | FullHouse -> 4
+    | Three -> 3
+    | TwoPair -> 2
+    | OnePair -> 1
+    | HighCard -> 0
+
+let card = function
+    | 'A' -> 12
+    | 'K' -> 11
+    | 'J' -> 11
+    | 'T' -> 10
+    | c -> int_of_char c
+
+let _get_hand_type hand =
+    let comp a b = if card a = card b then 0 else if  card b > card a then -1 else 0 in 
+    let _cards = List.init 5 Fun.id |> List.map (String.get hand) |> List.sort comp in
+    match cards with 
+    | [a;a;a;a;a] -> Five
+    | [a;a;a;a;_]|[_;a;a;a;a]  -> Four
+    | [a;a;a;b;b]|[b;b;a;a;a] -> FullHouse
+    | a :: a :: a :: _ :: _ | _::a::a::a::_ | a::a::a::_::_ -> Three
+    | a::a::b::b::_ | _::a::a::b::b ->  TwoPair
+    | a::a::_::_:: _
+
+
+let parse_line line =
+  let chunks = line |> split_str " " in
+  let hand = chunks |> nth 0 in
+  let value = chunks |> nth 1 |> int_of_string in
+  {hand; value}
+
+let solve lines =
+    let _entries = lines List.map parse_line in
+    16
+;;
+
+let sample_lines = get_lines "sample.txt" in
+let () = solve sample_lines |> Printf.printf "part1: %d\n" in
+(* 
+let lines = get_lines "input.txt" in
+let () = assert (solve sample_lines parse_line = 288) in
+let () = solve lines parse_line |> Printf.printf "part1: %d\n" in
+let () = assert (solve sample_lines parse_line2 = 71503) in
+let () = solve lines parse_line2 |> Printf.printf "part2: %d\n" in
+*)
+print_endline ""
