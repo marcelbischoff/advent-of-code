@@ -26,10 +26,13 @@ fn solve_part1(first: &Vec<i32>, second: &Vec<i32>) -> i32 {
         .sum()
 }
 fn multiplicity(second: Vec<i32>, i: i32) -> i32 {
-    second.iter().filter_map(|n| match n {
-        x if *x== i => Some(1),
-        _ => None,
-    }).sum()
+    second
+        .iter()
+        .filter_map(|n| match n {
+            x if *x == i => Some(1),
+            _ => None,
+        })
+        .sum()
 }
 
 fn solve_part2(first: &Vec<i32>, second: &Vec<i32>) -> i32 {
