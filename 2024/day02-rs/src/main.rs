@@ -68,7 +68,7 @@ fn is_safe_two(line: Vec<i32>) -> i32 {
     if is_safe(line.clone()) == 1 {
         return 1;
     };
-    if (0..(line.len().try_into().unwrap()))
+    if (0..(line.len()))
         .map(|i| {
             line.clone()
                 .into_iter()
