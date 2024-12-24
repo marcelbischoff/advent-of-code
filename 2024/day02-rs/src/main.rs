@@ -32,8 +32,8 @@ fn first_state(previous: i32, current: i32) -> State {
     State::NotSafe
 }
 
-fn is_safe(line: Vec<i32>) -> i32 {
-    let (_, res) = line.into_iter().fold(
+fn is_safe(line: &Vec<i32>) -> i32 {
+    let (_, res) = line.to_vec().into_iter().fold(
         (None, State::Undetermined),
         |(prior, state), current: i32| match (prior, state) {
             (None, State::Undetermined) => (Some(current), State::Undetermined),
@@ -64,8 +64,8 @@ fn is_safe(line: Vec<i32>) -> i32 {
     }
 }
 
-fn is_safe_two(line: Vec<i32>) -> i32 {
-    if is_safe(line.clone()) == 1 {
+fn is_safe_two(line: &Vec<i32>) -> i32 {
+    if is_safe(&line) == 1 {
         return 1;
     };
     if (0..(line.len()))
@@ -73,18 +73,12 @@ fn is_safe_two(line: Vec<i32>) -> i32 {
             line.clone()
                 .into_iter()
                 .enumerate()
-                .filter_map(|(j, s)| {
-                    if i as i32 != j.try_into().unwrap() {
-                        Some(s)
-                    } else {
-                        None
-                    }
-                })
+                .filter_map(|(j, s)| if i != j { Some(s) } else { None })
                 .collect()
         })
         .collect::<Vec<Vec<i32>>>()
         .iter()
-        .any(|line| is_safe(line.to_vec()) > 0)
+        .any(|line| is_safe(&line) == 1)
     {
         return 1;
     };
@@ -98,7 +92,7 @@ fn main() {
         sample_lines
             .clone()
             .into_iter()
-            .map(is_safe)
+            .map(|line:Vec<i32>| is_safe(&line))
             .into_iter()
             .sum::<i32>()
             == 2
@@ -106,17 +100,17 @@ fn main() {
 
     let input = fs::read_to_string("../day02/input.txt").expect("file not found");
     let lines: Vec<Vec<i32>> = parse_lines(&input);
-    let result: i32 = lines.clone().into_iter().map(is_safe).into_iter().sum();
+    let result: i32 = lines.clone().into_iter().map(|line| is_safe(&line)).into_iter().sum();
     assert!(result == 524);
 
     assert!(
         sample_lines
             .into_iter()
-            .map(is_safe_two)
+            .map(|line: Vec<i32>| is_safe_two(&line))
             .into_iter()
             .sum::<i32>()
             == 4
     );
-    let result: i32 = lines.clone().into_iter().map(is_safe_two).into_iter().sum();
-    println!("result: {result}");
+    let result: i32 = lines.clone().into_iter().map(|line| is_safe_two(&line)).into_iter().sum();
+    assert!(result == 569);
 }
