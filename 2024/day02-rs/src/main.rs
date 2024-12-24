@@ -92,7 +92,7 @@ fn main() {
         sample_lines
             .clone()
             .into_iter()
-            .map(|line:Vec<i32>| is_safe(&line))
+            .map(|line: Vec<i32>| is_safe(&line))
             .into_iter()
             .sum::<i32>()
             == 2
@@ -100,7 +100,12 @@ fn main() {
 
     let input = fs::read_to_string("../day02/input.txt").expect("file not found");
     let lines: Vec<Vec<i32>> = parse_lines(&input);
-    let result: i32 = lines.clone().into_iter().map(|line| is_safe(&line)).into_iter().sum();
+    let result: i32 = lines
+        .clone()
+        .into_iter()
+        .map(|line| is_safe(&line))
+        .into_iter()
+        .sum();
     assert!(result == 524);
 
     assert!(
@@ -111,6 +116,11 @@ fn main() {
             .sum::<i32>()
             == 4
     );
-    let result: i32 = lines.clone().into_iter().map(|line| is_safe_two(&line)).into_iter().sum();
+    let result: i32 = lines
+        .clone()
+        .into_iter()
+        .map(|line| is_safe_two(&line))
+        .into_iter()
+        .sum();
     assert!(result == 569);
 }
